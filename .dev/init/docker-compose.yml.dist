@@ -1,0 +1,33 @@
+version: '3.9'
+
+services:
+
+  frontend:
+    container_name: frontend
+    build: frontend
+    ports:
+      - 8010:80
+    volumes:
+      - ~/.composer-docker/cache:/root/.composer/cache:delegated
+      - ./:/app
+
+  db:
+    container_name: mariadb
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: $DB_NAME
+      MYSQL_ROOT_PASSWORD: $DB_PASSWORD
+    volumes:
+      - ./.dev/mysql/db:/var/lib/mysql
+      - ./.dev/mysql/logs:/var/log/mysql
+      - ./.dev/conf:/etc/mysql/conf.d
+      - ./.dev/dumps:/docker-entrypoint-initdb.d
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    ports:
+      - 8011:80
+    environment:
+      - PMA_ARBITRARY=1
